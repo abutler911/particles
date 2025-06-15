@@ -69,15 +69,18 @@
           cursor: pointer;
           user-select: none;
           touch-action: manipulation;
-        }
-
-        .controls.expanded .mobile-toggle {
-          background: rgba(255, 68, 68, 0.2);
+          display: none;
         }
       }
 
       .control-group {
-        margin-bottom: 15px;
+        margin-bottom: 12px;
+      }
+
+      @media (max-width: 768px) {
+        .control-group {
+          margin-bottom: 8px;
+        }
       }
 
       label {
@@ -85,31 +88,51 @@
         margin-bottom: 5px;
         color: #8cc8ff;
         font-weight: bold;
+        font-size: 14px;
+      }
+
+      @media (max-width: 768px) {
+        label {
+          font-size: 12px;
+          margin-bottom: 3px;
+        }
       }
 
       select,
       input[type="range"] {
         width: 100%;
-        padding: 10px;
+        padding: 8px;
         background: #1a1a3a;
         border: 1px solid #555;
-        border-radius: 8px;
+        border-radius: 6px;
         color: #fff;
-        font-size: 16px;
+        font-size: 14px;
         box-sizing: border-box;
       }
 
       input[type="range"] {
-        height: 40px;
+        height: 35px;
         -webkit-appearance: none;
         appearance: none;
+      }
+
+      @media (max-width: 768px) {
+        select,
+        input[type="range"] {
+          padding: 6px;
+          font-size: 12px;
+        }
+
+        input[type="range"] {
+          height: 30px;
+        }
       }
 
       input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 25px;
-        height: 25px;
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
         background: #8cc8ff;
         cursor: pointer;
@@ -117,40 +140,57 @@
       }
 
       input[type="range"]::-moz-range-thumb {
-        width: 25px;
-        height: 25px;
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
         background: #8cc8ff;
         cursor: pointer;
         border: 2px solid #fff;
       }
 
+      @media (max-width: 768px) {
+        input[type="range"]::-webkit-slider-thumb {
+          width: 18px;
+          height: 18px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+          width: 18px;
+          height: 18px;
+        }
+      }
+
       .particle-type {
-        padding: 12px 16px;
-        margin: 4px;
+        padding: 8px 12px;
+        margin: 2px;
         border: none;
-        border-radius: 25px;
+        border-radius: 20px;
         cursor: pointer;
         font-weight: bold;
         transition: all 0.2s;
-        font-size: 16px;
-        min-width: 80px;
+        font-size: 14px;
         touch-action: manipulation;
       }
 
       @media (max-width: 768px) {
         .particle-type {
-          padding: 15px 20px;
-          margin: 5px 2px;
-          font-size: 18px;
-          min-width: 90px;
-          flex: 1;
+          padding: 6px 10px;
+          margin: 1px;
+          font-size: 12px;
+          border-radius: 15px;
         }
 
         .particle-buttons {
           display: flex;
           flex-wrap: wrap;
-          gap: 5px;
+          gap: 2px;
+          justify-content: space-between;
+        }
+
+        .particle-buttons .particle-type {
+          flex: 1;
+          min-width: 0;
+          text-align: center;
         }
       }
 
@@ -177,11 +217,11 @@
 
       .stats {
         position: absolute;
-        top: 20px;
+        bottom: 20px;
         right: 20px;
         background: rgba(0, 0, 0, 0.8);
-        padding: 15px;
-        border-radius: 10px;
+        padding: 10px;
+        border-radius: 8px;
         border: 2px solid #333;
         backdrop-filter: blur(10px);
         font-size: 12px;
@@ -190,12 +230,10 @@
 
       @media (max-width: 768px) {
         .stats {
-          top: 10px;
+          bottom: 10px;
           right: 10px;
-          left: auto;
-          bottom: auto;
-          font-size: 14px;
-          padding: 10px;
+          font-size: 10px;
+          padding: 8px;
         }
 
         .stats div:last-child {
@@ -204,15 +242,15 @@
       }
 
       .clear-btn {
-        padding: 15px 25px;
+        padding: 10px 20px;
         background: linear-gradient(45deg, #ff4444, #ff6666);
         border: none;
-        border-radius: 25px;
+        border-radius: 20px;
         color: white;
         font-weight: bold;
         cursor: pointer;
         transition: all 0.2s;
-        font-size: 16px;
+        font-size: 14px;
         width: 100%;
         touch-action: manipulation;
       }
@@ -225,8 +263,9 @@
 
       @media (max-width: 768px) {
         .clear-btn {
-          padding: 18px 30px;
-          font-size: 18px;
+          padding: 8px 16px;
+          font-size: 12px;
+          border-radius: 15px;
         }
       }
     </style>
@@ -235,7 +274,6 @@
     <canvas id="canvas"></canvas>
 
     <div class="controls">
-      <div class="mobile-toggle">⚙️ Controls - Tap to expand</div>
       <h3 style="margin-top: 0; color: #fff; text-align: center">
         🌌 Particle Sandbox
       </h3>
@@ -443,45 +481,6 @@
         }
       }
 
-      // Mobile controls toggle
-      const controls = document.querySelector(".controls");
-      const mobileToggle = document.querySelector(".mobile-toggle");
-      let controlsExpanded = false;
-
-      function toggleControls() {
-        if (window.innerWidth <= 768) {
-          controlsExpanded = !controlsExpanded;
-          controls.classList.toggle("expanded", controlsExpanded);
-          if (mobileToggle) {
-            mobileToggle.textContent = controlsExpanded
-              ? "⚙️ Controls - Tap to minimize"
-              : "⚙️ Controls - Tap to expand";
-          }
-        }
-      }
-
-      function initMobileControls() {
-        if (window.innerWidth <= 768 && mobileToggle) {
-          mobileToggle.style.display = "block";
-          mobileToggle.addEventListener("click", (e) => {
-            e.stopPropagation();
-            toggleControls();
-          });
-          mobileToggle.addEventListener("touchend", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleControls();
-          });
-        } else if (mobileToggle) {
-          mobileToggle.style.display = "none";
-          controls.classList.remove("expanded");
-          controlsExpanded = false;
-        }
-      }
-
-      // Initialize mobile controls
-      initMobileControls();
-
       // Event listeners
       document.querySelectorAll(".particle-type").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -584,7 +583,6 @@
       window.addEventListener("resize", () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        initMobileControls(); // Reinitialize mobile controls on resize
       });
 
       // Start animation
