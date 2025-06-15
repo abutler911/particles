@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Particle Sandbox</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #0f0f23, #1a1a3a);
+        font-family: "Courier New", monospace;
+        color: #fff;
+        overflow: hidden;
+      }
+
+      canvas {
+        display: block;
+        cursor: crosshair;
+        background: radial-gradient(circle at center, #0a0a1a, #000);
+      }
+
+      .controls {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        border: 2px solid #333;
+        backdrop-filter: blur(10px);
+      }
+
+      .control-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: #8cc8ff;
+        font-weight: bold;
+      }
+
+      select,
+      input[type="range"] {
+        width: 150px;
+        padding: 5px;
+        background: #1a1a3a;
+        border: 1px solid #555;
+        border-radius: 5px;
+        color: #fff;
+      }
+
+      .particle-type {
+        padding: 8px 12px;
+        margin: 2px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s;
+      }
+
+      .particle-type.active {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      }
+
+      .fire {
+        background: linear-gradient(45deg, #ff4444, #ff8844);
+      }
+      .water {
+        background: linear-gradient(45deg, #4444ff, #44aaff);
+      }
+      .earth {
+        background: linear-gradient(45deg, #8b4513, #daa520);
+      }
+      .air {
+        background: linear-gradient(45deg, #e6e6fa, #b0e0e6);
+      }
+      .plasma {
+        background: linear-gradient(45deg, #ff00ff, #00ffff);
+      }
+
+      .stats {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #333;
+        backdrop-filter: blur(10px);
+        font-size: 12px;
+      }
+
+      .clear-btn {
+        padding: 10px 20px;
+        background: linear-gradient(45deg, #ff4444, #ff6666);
+        border: none;
+        border-radius: 25px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .clear-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+      <h3 style="margin-top: 0; color: #fff; text-align: center">
+        🌌 Particle Sandbox
+      </h3>
+
+      <div class="control-group">
+        <label>Particle Type:</label>
+        <div>
+          <button class="particle-type fire active" data-type="fire">
+            🔥 Fire
+          </button>
+          <button class="particle-type water" data-type="water">
+            💧 Water
+          </button>
+          <button class="particle-type earth" data-type="earth">
+            🌍 Earth
+          </button>
+          <button class="particle-type air" data-type="air">💨 Air</button>
+          <button class="particle-type plasma" data-type="plasma">
+            ⚡ Plasma
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Spawn Rate:</label>
+        <input type="range" id="spawnRate" min="1" max="10" value="3" />
+      </div>
+
+      <div class="control-group">
+        <label>Gravity:</label>
+        <input
+          type="range"
+          id="gravity"
+          min="0"
+          max="2"
+          step="0.1"
+          value="0.3"
+        />
+      </div>
+
+      <div class="control-group">
+        <button class="clear-btn" onclick="clearParticles()">Clear All</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div>Particles: <span id="particleCount">0</span></div>
+      <div>FPS: <span id="fps">60</span></div>
+      <div>Click and drag to create particles!</div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      let currentType = "fire";
+      let isMouseDown = false;
+      let lastTime = 0;
+      let frameCount = 0;
+      let lastFpsTime = 0;
+
+      const particleTypes = {
+        fire: {
+          color: () =>
+            `hsl(${Math.random() * 60}, 100%, ${50 + Math.random() * 30}%)`,
+          life: 120,
+          gravity: -0.1,
+          spread: 2,
+        },
+        water: {
+          color: () =>
+            `hsl(${200 + Math.random() * 40}, 80%, ${
+              40 + Math.random() * 30
+            }%)`,
+          life: 200,
+          gravity: 0.2,
+          spread: 1,
+        },
+        earth: {
+          color: () =>
+            `hsl(${30 + Math.random() * 40}, 60%, ${20 + Math.random() * 40}%)`,
+          life: 300,
+          gravity: 0.4,
+          spread: 0.5,
+        },
+        air: {
+          color: () =>
+            `hsl(${180 + Math.random() * 60}, 30%, ${
+              70 + Math.random() * 20
+            }%)`,
+          life: 150,
+          gravity: -0.05,
+          spread: 3,
+        },
+        plasma: {
+          color: () =>
+            `hsl(${280 + Math.random() * 80}, 100%, ${
+              60 + Math.random() * 30
+            }%)`,
+          life: 100,
+          gravity: 0,
+          spread: 4,
+        },
+      };
+
+      class Particle {
+        constructor(x, y, type) {
+          this.x = x;
+          this.y = y;
+          this.type = type;
+          this.config = particleTypes[type];
+          this.vx = (Math.random() - 0.5) * this.config.spread;
+          this.vy = (Math.random() - 0.5) * this.config.spread;
+          this.life = this.config.life;
+          this.maxLife = this.config.life;
+          this.size = Math.random() * 4 + 2;
+          this.color = this.config.color();
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          const gravity = parseFloat(document.getElementById("gravity").value);
+          this.vy += this.config.gravity + gravity;
+
+          // Add some air resistance
+          this.vx *= 0.99;
+          this.vy *= 0.99;
+
+          // Bounce off walls
+          if (this.x < 0 || this.x > canvas.width) this.vx *= -0.8;
+          if (this.y > canvas.height) this.vy *= -0.6;
+
+          this.x = Math.max(0, Math.min(canvas.width, this.x));
+          this.y = Math.max(0, Math.min(canvas.height, this.y));
+
+          this.life--;
+
+          // Particle interactions
+          if (this.type === "fire") {
+            this.size = Math.max(0, this.size - 0.05);
+          }
+
+          return this.life > 0 && this.size > 0;
+        }
+
+        draw() {
+          const alpha = this.life / this.maxLife;
+          ctx.save();
+
+          if (this.type === "plasma") {
+            // Plasma glow effect
+            const gradient = ctx.createRadialGradient(
+              this.x,
+              this.y,
+              0,
+              this.x,
+              this.y,
+              this.size * 3
+            );
+            gradient.addColorStop(
+              0,
+              this.color.replace(")", `, ${alpha})`).replace("hsl", "hsla")
+            );
+            gradient.addColorStop(1, "transparent");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(
+              this.x - this.size * 3,
+              this.y - this.size * 3,
+              this.size * 6,
+              this.size * 6
+            );
+          }
+
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Add sparkle effect for some types
+          if (
+            (this.type === "plasma" || this.type === "fire") &&
+            Math.random() < 0.3
+          ) {
+            ctx.fillStyle = "white";
+            ctx.globalAlpha = alpha * 0.8;
+            ctx.beginPath();
+            ctx.arc(
+              this.x + Math.random() * 4 - 2,
+              this.y + Math.random() * 4 - 2,
+              0.5,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+          }
+
+          ctx.restore();
+        }
+      }
+
+      // Event listeners
+      document.querySelectorAll(".particle-type").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelector(".particle-type.active")
+            .classList.remove("active");
+          btn.classList.add("active");
+          currentType = btn.dataset.type;
+        });
+      });
+
+      canvas.addEventListener("mousedown", (e) => {
+        isMouseDown = true;
+        createParticles(e.clientX, e.clientY);
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (isMouseDown) {
+          createParticles(e.clientX, e.clientY);
+        }
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        isMouseDown = false;
+      });
+
+      // Touch events for mobile
+      canvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        isMouseDown = true;
+        const touch = e.touches[0];
+        createParticles(touch.clientX, touch.clientY);
+      });
+
+      canvas.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        if (isMouseDown) {
+          const touch = e.touches[0];
+          createParticles(touch.clientX, touch.clientY);
+        }
+      });
+
+      canvas.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        isMouseDown = false;
+      });
+
+      function createParticles(x, y) {
+        const spawnRate = parseInt(document.getElementById("spawnRate").value);
+        for (let i = 0; i < spawnRate; i++) {
+          particles.push(
+            new Particle(
+              x + (Math.random() - 0.5) * 20,
+              y + (Math.random() - 0.5) * 20,
+              currentType
+            )
+          );
+        }
+      }
+
+      function clearParticles() {
+        particles.length = 0;
+      }
+
+      function animate(currentTime) {
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        // Clear canvas with trail effect
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Update and draw particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          if (!particles[i].update()) {
+            particles.splice(i, 1);
+          } else {
+            particles[i].draw();
+          }
+        }
+
+        // Update stats
+        document.getElementById("particleCount").textContent = particles.length;
+
+        // Calculate FPS
+        frameCount++;
+        if (currentTime - lastFpsTime >= 1000) {
+          document.getElementById("fps").textContent = Math.round(
+            (frameCount * 1000) / (currentTime - lastFpsTime)
+          );
+          frameCount = 0;
+          lastFpsTime = currentTime;
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      // Handle window resize
+      window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      // Start animation
+      requestAnimationFrame(animate);
+    </script>
+  </body>
+</html>
