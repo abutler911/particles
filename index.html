@@ -54,24 +54,25 @@
           transform: translateY(0);
         }
 
-        .controls::before {
-          content: "⚙️ Controls - Tap to expand";
+        .mobile-toggle {
           position: absolute;
           top: -50px;
           left: 50%;
           transform: translateX(-50%);
           background: rgba(0, 0, 0, 0.9);
-          padding: 10px 20px;
+          padding: 12px 24px;
           border-radius: 20px 20px 0 0;
           border: 2px solid #333;
           border-bottom: none;
           font-size: 14px;
           white-space: nowrap;
-          pointer-events: none;
+          cursor: pointer;
+          user-select: none;
+          touch-action: manipulation;
         }
 
-        .controls.expanded::before {
-          content: "⚙️ Controls - Tap to minimize";
+        .controls.expanded .mobile-toggle {
+          background: rgba(255, 68, 68, 0.2);
         }
       }
 
@@ -234,6 +235,7 @@
     <canvas id="canvas"></canvas>
 
     <div class="controls">
+      <div class="mobile-toggle">⚙️ Controls - Tap to expand</div>
       <h3 style="margin-top: 0; color: #fff; text-align: center">
         🌌 Particle Sandbox
       </h3>
@@ -443,27 +445,42 @@
 
       // Mobile controls toggle
       const controls = document.querySelector(".controls");
+      const mobileToggle = document.querySelector(".mobile-toggle");
       let controlsExpanded = false;
 
       function toggleControls() {
         if (window.innerWidth <= 768) {
           controlsExpanded = !controlsExpanded;
           controls.classList.toggle("expanded", controlsExpanded);
+          if (mobileToggle) {
+            mobileToggle.textContent = controlsExpanded
+              ? "⚙️ Controls - Tap to minimize"
+              : "⚙️ Controls - Tap to expand";
+          }
         }
       }
 
-      controls.addEventListener("click", (e) => {
-        if (window.innerWidth <= 768 && e.target === controls) {
-          toggleControls();
+      function initMobileControls() {
+        if (window.innerWidth <= 768 && mobileToggle) {
+          mobileToggle.style.display = "block";
+          mobileToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleControls();
+          });
+          mobileToggle.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleControls();
+          });
+        } else if (mobileToggle) {
+          mobileToggle.style.display = "none";
+          controls.classList.remove("expanded");
+          controlsExpanded = false;
         }
-      });
+      }
 
-      controls.addEventListener("touchstart", (e) => {
-        if (window.innerWidth <= 768 && e.target === controls) {
-          e.preventDefault();
-          toggleControls();
-        }
-      });
+      // Initialize mobile controls
+      initMobileControls();
 
       // Event listeners
       document.querySelectorAll(".particle-type").forEach((btn) => {
@@ -514,11 +531,12 @@
 
       function createParticles(x, y) {
         const spawnRate = parseInt(document.getElementById("spawnRate").value);
-        for (let i = 0; i < spawnRate; i++) {
+        const multiplier = window.innerWidth <= 768 ? 2 : 1; // More particles on mobile for better visibility
+        for (let i = 0; i < spawnRate * multiplier; i++) {
           particles.push(
             new Particle(
-              x + (Math.random() - 0.5) * 20,
-              y + (Math.random() - 0.5) * 20,
+              x + (Math.random() - 0.5) * 30,
+              y + (Math.random() - 0.5) * 30,
               currentType
             )
           );
@@ -566,6 +584,7 @@
       window.addEventListener("resize", () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        initMobileControls(); // Reinitialize mobile controls on resize
       });
 
       // Start animation
