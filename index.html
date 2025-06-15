@@ -24,63 +24,26 @@
         position: absolute;
         top: 10px;
         left: 10px;
-        right: 10px;
         background: rgba(0, 0, 0, 0.9);
         padding: 15px;
-        border-radius: 15px;
+        border-radius: 10px;
         border: 2px solid #333;
         backdrop-filter: blur(10px);
-        max-width: 100%;
-        box-sizing: border-box;
+        min-width: 200px;
       }
 
       @media (max-width: 768px) {
         .controls {
-          position: fixed;
-          bottom: 0;
-          top: auto;
-          left: 0;
-          right: 0;
-          border-radius: 20px 20px 0 0;
-          padding: 20px;
-          max-height: 40vh;
-          overflow-y: auto;
-          transform: translateY(calc(100% - 60px));
-          transition: transform 0.3s ease;
-          z-index: 1000;
-        }
-
-        .controls.expanded {
-          transform: translateY(0);
-        }
-
-        .mobile-toggle {
-          position: absolute;
-          top: -50px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(0, 0, 0, 0.9);
-          padding: 12px 24px;
-          border-radius: 20px 20px 0 0;
-          border: 2px solid #333;
-          border-bottom: none;
+          top: 5px;
+          left: 5px;
+          padding: 10px;
+          min-width: 180px;
           font-size: 14px;
-          white-space: nowrap;
-          cursor: pointer;
-          user-select: none;
-          touch-action: manipulation;
-          display: none;
         }
       }
 
       .control-group {
-        margin-bottom: 12px;
-      }
-
-      @media (max-width: 768px) {
-        .control-group {
-          margin-bottom: 8px;
-        }
+        margin-bottom: 10px;
       }
 
       label {
@@ -88,115 +51,29 @@
         margin-bottom: 5px;
         color: #8cc8ff;
         font-weight: bold;
-        font-size: 14px;
+        font-size: 13px;
       }
 
-      @media (max-width: 768px) {
-        label {
-          font-size: 12px;
-          margin-bottom: 3px;
-        }
-      }
-
-      select,
-      input[type="range"] {
-        width: 100%;
-        padding: 8px;
-        background: #1a1a3a;
-        border: 1px solid #555;
-        border-radius: 6px;
-        color: #fff;
-        font-size: 14px;
-        box-sizing: border-box;
-      }
-
-      input[type="range"] {
-        height: 35px;
-        -webkit-appearance: none;
-        appearance: none;
-      }
-
-      @media (max-width: 768px) {
-        select,
-        input[type="range"] {
-          padding: 6px;
-          font-size: 12px;
-        }
-
-        input[type="range"] {
-          height: 30px;
-        }
-      }
-
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #8cc8ff;
-        cursor: pointer;
-        border: 2px solid #fff;
-      }
-
-      input[type="range"]::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #8cc8ff;
-        cursor: pointer;
-        border: 2px solid #fff;
-      }
-
-      @media (max-width: 768px) {
-        input[type="range"]::-webkit-slider-thumb {
-          width: 18px;
-          height: 18px;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-          width: 18px;
-          height: 18px;
-        }
+      .particle-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 3px;
       }
 
       .particle-type {
-        padding: 8px 12px;
-        margin: 2px;
+        padding: 6px 10px;
         border: none;
-        border-radius: 20px;
+        border-radius: 15px;
         cursor: pointer;
         font-weight: bold;
+        font-size: 12px;
         transition: all 0.2s;
-        font-size: 14px;
         touch-action: manipulation;
-      }
-
-      @media (max-width: 768px) {
-        .particle-type {
-          padding: 6px 10px;
-          margin: 1px;
-          font-size: 12px;
-          border-radius: 15px;
-        }
-
-        .particle-buttons {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 2px;
-          justify-content: space-between;
-        }
-
-        .particle-buttons .particle-type {
-          flex: 1;
-          min-width: 0;
-          text-align: center;
-        }
       }
 
       .particle-type.active {
         transform: scale(1.1);
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
       }
 
       .fire {
@@ -215,57 +92,74 @@
         background: linear-gradient(45deg, #ff00ff, #00ffff);
       }
 
-      .stats {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(0, 0, 0, 0.8);
-        padding: 10px;
-        border-radius: 8px;
-        border: 2px solid #333;
-        backdrop-filter: blur(10px);
-        font-size: 12px;
-        z-index: 999;
+      input[type="range"] {
+        width: 100%;
+        height: 25px;
+        -webkit-appearance: none;
+        background: #1a1a3a;
+        border-radius: 5px;
+        outline: none;
       }
 
-      @media (max-width: 768px) {
-        .stats {
-          bottom: 10px;
-          right: 10px;
-          font-size: 10px;
-          padding: 8px;
-        }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #8cc8ff;
+        cursor: pointer;
+        border: 2px solid #fff;
+      }
 
-        .stats div:last-child {
-          display: none;
-        }
+      input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #8cc8ff;
+        cursor: pointer;
+        border: 2px solid #fff;
       }
 
       .clear-btn {
-        padding: 10px 20px;
+        padding: 8px 15px;
         background: linear-gradient(45deg, #ff4444, #ff6666);
         border: none;
-        border-radius: 20px;
+        border-radius: 15px;
         color: white;
         font-weight: bold;
         cursor: pointer;
-        transition: all 0.2s;
-        font-size: 14px;
         width: 100%;
+        font-size: 12px;
         touch-action: manipulation;
       }
 
-      .clear-btn:hover,
       .clear-btn:active {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        transform: scale(0.95);
+      }
+
+      .stats {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.9);
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 2px solid #333;
+        backdrop-filter: blur(10px);
+        font-size: 11px;
+      }
+
+      h3 {
+        margin: 0 0 10px 0;
+        color: #fff;
+        text-align: center;
+        font-size: 16px;
       }
 
       @media (max-width: 768px) {
-        .clear-btn {
-          padding: 8px 16px;
-          font-size: 12px;
-          border-radius: 15px;
+        h3 {
+          font-size: 14px;
+          margin: 0 0 8px 0;
         }
       }
     </style>
@@ -274,26 +168,16 @@
     <canvas id="canvas"></canvas>
 
     <div class="controls">
-      <h3 style="margin-top: 0; color: #fff; text-align: center">
-        🌌 Particle Sandbox
-      </h3>
+      <h3>🌌 Particle Sandbox</h3>
 
       <div class="control-group">
         <label>Particle Type:</label>
         <div class="particle-buttons">
-          <button class="particle-type fire active" data-type="fire">
-            🔥 Fire
-          </button>
-          <button class="particle-type water" data-type="water">
-            💧 Water
-          </button>
-          <button class="particle-type earth" data-type="earth">
-            🌍 Earth
-          </button>
-          <button class="particle-type air" data-type="air">💨 Air</button>
-          <button class="particle-type plasma" data-type="plasma">
-            ⚡ Plasma
-          </button>
+          <button class="particle-type fire active" data-type="fire">🔥</button>
+          <button class="particle-type water" data-type="water">💧</button>
+          <button class="particle-type earth" data-type="earth">🌍</button>
+          <button class="particle-type air" data-type="air">💨</button>
+          <button class="particle-type plasma" data-type="plasma">⚡</button>
         </div>
       </div>
 
@@ -322,7 +206,6 @@
     <div class="stats">
       <div>Particles: <span id="particleCount">0</span></div>
       <div>FPS: <span id="fps">60</span></div>
-      <div>Click and drag to create particles!</div>
     </div>
 
     <script>
@@ -404,11 +287,9 @@
           const gravity = parseFloat(document.getElementById("gravity").value);
           this.vy += this.config.gravity + gravity;
 
-          // Add some air resistance
           this.vx *= 0.99;
           this.vy *= 0.99;
 
-          // Bounce off walls
           if (this.x < 0 || this.x > canvas.width) this.vx *= -0.8;
           if (this.y > canvas.height) this.vy *= -0.6;
 
@@ -417,7 +298,6 @@
 
           this.life--;
 
-          // Particle interactions
           if (this.type === "fire") {
             this.size = Math.max(0, this.size - 0.05);
           }
@@ -430,7 +310,6 @@
           ctx.save();
 
           if (this.type === "plasma") {
-            // Plasma glow effect
             const gradient = ctx.createRadialGradient(
               this.x,
               this.y,
@@ -459,7 +338,6 @@
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
           ctx.fill();
 
-          // Add sparkle effect for some types
           if (
             (this.type === "plasma" || this.type === "fire") &&
             Math.random() < 0.3
@@ -507,7 +385,6 @@
         isMouseDown = false;
       });
 
-      // Touch events for mobile
       canvas.addEventListener("touchstart", (e) => {
         e.preventDefault();
         isMouseDown = true;
@@ -530,12 +407,11 @@
 
       function createParticles(x, y) {
         const spawnRate = parseInt(document.getElementById("spawnRate").value);
-        const multiplier = window.innerWidth <= 768 ? 2 : 1; // More particles on mobile for better visibility
-        for (let i = 0; i < spawnRate * multiplier; i++) {
+        for (let i = 0; i < spawnRate; i++) {
           particles.push(
             new Particle(
-              x + (Math.random() - 0.5) * 30,
-              y + (Math.random() - 0.5) * 30,
+              x + (Math.random() - 0.5) * 20,
+              y + (Math.random() - 0.5) * 20,
               currentType
             )
           );
@@ -550,11 +426,9 @@
         const deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        // Clear canvas with trail effect
         ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Update and draw particles
         for (let i = particles.length - 1; i >= 0; i--) {
           if (!particles[i].update()) {
             particles.splice(i, 1);
@@ -563,10 +437,8 @@
           }
         }
 
-        // Update stats
         document.getElementById("particleCount").textContent = particles.length;
 
-        // Calculate FPS
         frameCount++;
         if (currentTime - lastFpsTime >= 1000) {
           document.getElementById("fps").textContent = Math.round(
@@ -579,13 +451,11 @@
         requestAnimationFrame(animate);
       }
 
-      // Handle window resize
       window.addEventListener("resize", () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       });
 
-      // Start animation
       requestAnimationFrame(animate);
     </script>
   </body>
